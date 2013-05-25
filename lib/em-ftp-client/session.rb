@@ -58,8 +58,17 @@ module EventMachine
         control_connection.pasv
       end
 
+      def put_stream(filename, data, &cb)
+        control_connection.callback do |data_connection|
+          data_connection.send_stream(data)
+          control_connection.callback(&cb)
+          control_connection.stor filename
+        end
+        control_connection.pasv
+      end
+
       def close
-        @control_connection.callback do 
+        @control_connection.callback do
           yield if block_given?
         end
         @control_connection.close

@@ -6,8 +6,10 @@ module EventMachine
       def initialize( timeout = 5)
         set_pending_connect_timeout timeout
       end
+
       def on_connect(&blk); @on_connect = blk; end
       def on_file_sent(&blk); @on_file_sent = blk; end
+      def on_stream_sent(&blk); @on_stream_sent = blk; end
 
       def stream(&blk); @stream = blk; end
 
@@ -35,6 +37,14 @@ module EventMachine
           close_connection_after_writing
         }
       end
+
+      def send_stream(data)
+        streamer = EventMachine::FtpClient::StringStreamer.new(self, data)
+        streamer.callback{
+          # data was sent successfully
+          @on_stream_sent.call(self) if @on_stream_sent
+          close_connection_after_writing
+        }
       end
 
       def unbind
