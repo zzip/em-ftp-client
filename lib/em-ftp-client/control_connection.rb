@@ -2,7 +2,7 @@ module EventMachine
   module FtpClient
     class ControlConnection < Connection
       include Protocols::LineText2
-  
+
       attr_accessor :username, :password
 
       attr_reader :responder
@@ -66,8 +66,9 @@ module EventMachine
           line
         end
       end
-  
-      def initialize
+
+      def initialize( timeout = 5)
+        set_pending_connect_timeout timeout
       end
 
       def post_init
@@ -75,7 +76,7 @@ module EventMachine
         @response = Response.new
         @responder = nil
       end
-  
+
       def connection_completed
         @responder = :receive_greetings
       end
@@ -170,7 +171,7 @@ module EventMachine
         send_data("STOR #{filename}\r\n")
         @responder = :stor_response
       end
-      
+
       def close
         if @data_connection
           raise "Can not close connection while data connection is still open"
@@ -185,7 +186,7 @@ module EventMachine
       end
 
       # handlers
-      
+
       # Called after initial connection
       def receive_greetings(banner)
         if banner.code == "220"
@@ -296,7 +297,7 @@ module EventMachine
           call_callback(file_list)
         end
       end
-      
+
       def close_response(response=nil)
         close_connection
         call_callback

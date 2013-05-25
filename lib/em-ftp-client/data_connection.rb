@@ -3,6 +3,9 @@ module EventMachine
     class DataConnection < Connection
       include Deferrable
 
+      def initialize( timeout = 5)
+        set_pending_connect_timeout timeout
+      end
       def on_connect(&blk); @on_connect = blk; end
       def on_file_sent(&blk); @on_file_sent = blk; end
 
