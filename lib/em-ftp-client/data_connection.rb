@@ -4,6 +4,7 @@ module EventMachine
       include Deferrable
 
       def on_connect(&blk); @on_connect = blk; end
+      def on_file_sent(&blk); @on_file_sent = blk; end
 
       def stream(&blk); @stream = blk; end
 
@@ -22,10 +23,15 @@ module EventMachine
           @buf = ''
         end
       end
-      
+
       def send_file(filename)
-	      send_file_data(filename)
-        close_connection_after_writing
+        streamer = EventMachine::FileStreamer.new(self, filename)
+        streamer.callback{
+          # file was sent successfully
+          @on_file_sent.call(self) if @on_file_sent
+          close_connection_after_writing
+        }
+      end
       end
 
       def unbind
