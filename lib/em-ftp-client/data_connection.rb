@@ -10,6 +10,7 @@ module EventMachine
       def on_connect(&blk); @on_connect = blk; end
       def on_file_sent(&blk); @on_file_sent = blk; end
       def on_stream_sent(&blk); @on_stream_sent = blk; end
+      def on_disconnect(&blk); @on_disconnect = blk; end
 
       def stream(&blk); @stream = blk; end
 
@@ -48,6 +49,7 @@ module EventMachine
       end
 
       def unbind
+        @on_disconnect.call(self) if @on_disconnect
         succeed(@buf)
       end
     end

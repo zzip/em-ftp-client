@@ -302,6 +302,10 @@ module EventMachine
         close_connection
         call_callback
       end
+
+      def unbind
+        #unbinding control
+      end
     end
   end
 end
